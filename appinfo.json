@@ -1,0 +1,19 @@
+{
+    "appKeys": {},
+    "capabilities": [
+        ""
+    ],
+    "companyName": "nickmsoccer@gmail.com",
+    "longName": "Rubiks timer",
+    "projectType": "native",
+    "resources": {
+        "media": []
+    },
+    "sdkVersion": "3",
+    "shortName": "Rubiks timer",
+    "uuid": "492c5830-2fa8-40e2-a74a-b28f05d43d9a",
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": false
+    }
+}
