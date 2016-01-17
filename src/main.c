@@ -2,8 +2,8 @@
 #include <pebble.h>
 #include <pebble.h>
 #define THRESHOLDL 180
-#define THRESHOLDM 450
-#define THRESHOLDH 250
+#define THRESHOLDM 400
+#define THRESHOLDH 270
 
 static Window *s_main_window;
 static TextLayer *s_time_layer;
