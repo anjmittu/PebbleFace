@@ -1,4 +1,4 @@
-#include <pebble.h>
+/*#include <pebble.h>
 #define THRESHOLDL 300
 #define THRESHOLDH 400
 
@@ -137,3 +137,4 @@ int main(){
 	deinit();
 	return 0;
 }
+*/
