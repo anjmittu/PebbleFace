@@ -1,12 +1,12 @@
 
 #include <pebble.h>
 #include <pebble.h>
-#define THRESHOLDREADY 50
-#define THRESHOLDSTART 300
-#define THRESHOLDSTOP 200
+#define THRESHOLDREADY 150
+#define THRESHOLDSTART 200
+#define THRESHOLDSTOP 300
 
 static Window *s_main_window;
-static TextLayer *s_time_layer;
+static TextLayer *s_time_layer, *status_layer;
 int prevY = 10000000;
 int prevX = 10000000;
 int prevZ = 10000000;
@@ -18,6 +18,7 @@ uint16_t mil_1, mil_2;
 int i = 0;
 bool STARTED = false ;
 int wait = 0;
+static char buf[] = "00000000000";
 
 void ftoa(char* str, double val, int precision) {
   //  start with positive/negative
@@ -64,7 +65,6 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
     //Calibrating or steadying
     if (i < 15 && !(abs(prevY - data[0].y) < THRESHOLDREADY && abs(prevX - data[0].x) < THRESHOLDREADY && abs(prevZ - data[0].z) < THRESHOLDREADY)) {
       //DISPLAY NOT READY
-      text_layer_set_text(s_time_layer, "Wait");
       i = 0;
       prevY = data[0].y;
   		prevX = data[0].x;
@@ -82,7 +82,7 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       i = 0;
       STARTED = true;
       wait = 20;
-      text_layer_set_text(s_time_layer, "Running");
+      text_layer_set_text(status_layer, "Running");
     }
     else if (i >= 20) { i = 10 ; return;}
     else {
@@ -96,6 +96,8 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
     //Timer stop
     time_ms(&time_2, &mil_2);
     STARTED = false;
+    i = 0;
+    wait = 5;
     vibes_long_pulse();
     
     time_ = time_2 - time_1;
@@ -103,7 +105,6 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
     //Extra .004 sec
     time_ = time_ + (mil/1000);
   
-    static char buf[] = "00000000000";
     ftoa(buf, time_, 3);
     text_layer_set_text(s_time_layer, buf);
   
@@ -128,13 +129,16 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
   accel_data_service_unsubscribe();
+  text_layer_set_text(status_layer, "Stopped");
+  text_layer_set_text(s_time_layer, buf);
 }
 
 static void main_window_load(Window *window){
 	Layer *window_layer = window_get_root_layer(window);
 	GRect bounds = layer_get_bounds(window_layer);
 	
-	s_time_layer = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(58, 52), bounds.size.w, 50));
+	s_time_layer = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(58, 60), bounds.size.w, 50));
+  status_layer = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(58, 25), bounds.size.w, 50));
 	
   if (watch_info_get_model() == WATCH_INFO_MODEL_PEBBLE_ORIGINAL) {
     window_set_background_color(window, GColorWhite);
@@ -142,12 +146,17 @@ static void main_window_load(Window *window){
     window_set_background_color(window, GColorGreen);
   }
 	text_layer_set_background_color(s_time_layer, GColorClear);
+  text_layer_set_background_color(status_layer, GColorClear);
   text_layer_set_text_color(s_time_layer, GColorBlack);
+  text_layer_set_text_color(status_layer, GColorBlack);
 	text_layer_set_font(s_time_layer, fonts_get_system_font(FONT_KEY_GOTHIC_28));
+  text_layer_set_font(status_layer, fonts_get_system_font(FONT_KEY_GOTHIC_28));
   text_layer_set_text(s_time_layer, "0.000");
   text_layer_set_text_alignment(s_time_layer, GTextAlignmentCenter);
+  text_layer_set_text_alignment(status_layer, GTextAlignmentCenter);
 	
 	layer_add_child(window_layer, text_layer_get_layer(s_time_layer));
+  layer_add_child(window_layer, text_layer_get_layer(status_layer));
 	
 	
 }
