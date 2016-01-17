@@ -15,6 +15,9 @@ double time_ = 0, mil = 0;
 double user_time = 5.00;
 time_t time_1, time_2;
 uint16_t mil_1, mil_2;
+int i = 0;
+bool STARTED = false ;
+int wait = 0;
 
 void ftoa(char* str, double val, int precision) {
   //  start with positive/negative
@@ -43,23 +46,6 @@ void ftoa(char* str, double val, int precision) {
   *str = '\0';
 }
 
-void inc(void* data){
-	time_ += 0.01;
-	//static char* s_buffer;
-
-  // Compose string of all data for 3 samples
-  //ftoa(s_buffer, time_, 3);
-	
-	//APP_LOG(APP_LOG_LEVEL_INFO, "%f", time_);
-
-  //Show the data
-  //text_layer_set_text(s_time_layer, s_buffer);
-}
-
-int i = 0;
-bool STARTED = false ;
-int wait = 0;
-
 static void data_handler(AccelData *data, uint32_t num_samples) {
   if (wait > 0){wait--; return;}
   if (STARTED == false){
@@ -73,7 +59,6 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
     //Calibrating or steadying
     if (i < 40 && !(abs(prevY - data[0].y) < THRESHOLDL && abs(prevX - data[0].x) < THRESHOLDL && abs(prevZ - data[0].z) < THRESHOLDL)) {
       //DISPLAY NOT READY
-      text_layer_set_text(s_time_layer , "not ready") ;
       APP_LOG(APP_LOG_LEVEL_INFO, "not ready");
       i = 0;
       prevY = data[0].y;
@@ -84,7 +69,6 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
     else { 
       //DISPLAY READY
       i++ ;
-      text_layer_set_text(s_time_layer , "ready") ;
       APP_LOG(APP_LOG_LEVEL_INFO, "%d" , i );
     }
     if (i >= 30 && i <= 56 && (abs(prevY - data[0].y) > THRESHOLDH || abs(prevZ - data[0].z) > THRESHOLDH || abs(prevX - data[0].x) > THRESHOLDH)){
@@ -103,7 +87,6 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       return;
     }
   }
-  text_layer_set_text(s_time_layer , "running");
   if ( (abs(prevY - data[0].y) > THRESHOLDM && abs(prevX - data[0].x) > THRESHOLDM && abs(prevZ - data[0].z) > THRESHOLDM) ) {
     //Timer stop
     time_ms(&time_2, &mil_2);
@@ -125,7 +108,6 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       } else {
         window_set_background_color(s_main_window, GColorRed);
       }
-      APP_LOG(APP_LOG_LEVEL_INFO, "Too high");
     }
   }
   
@@ -136,6 +118,9 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
   
 }
 
+static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
+  accel_data_service_unsubscribe();
+}
 
 static void main_window_load(Window *window){
 	Layer *window_layer = window_get_root_layer(window);
@@ -162,6 +147,9 @@ static void main_window_load(Window *window){
 static void main_window_unload(Window *window){
 	text_layer_destroy(s_time_layer);
 }
+static void click_config_provider(void *context) {
+  window_single_click_subscribe(BUTTON_ID_UP, up_click_handler);
+}
 
 void init(){
 	accel_data_service_subscribe(1, data_handler);
@@ -175,6 +163,8 @@ void init(){
     .unload = main_window_unload
   });
 	
+  window_set_click_config_provider(s_main_window, click_config_provider);
+  
 	window_stack_push(s_main_window, true);
 }
 
