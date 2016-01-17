@@ -1,9 +1,9 @@
 
 #include <pebble.h>
 #include <pebble.h>
-#define THRESHOLDL 100
-#define THRESHOLDM 200
-#define THRESHOLDH 300
+#define THRESHOLDL 230
+#define THRESHOLDM 250
+#define THRESHOLDH 250
 
 static Window *s_main_window;
 static TextLayer *s_time_layer;
@@ -71,7 +71,7 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       i++ ;
       APP_LOG(APP_LOG_LEVEL_INFO, "%d" , i );
     }
-    if (i >= 30 && i <= 56 && (abs(prevY - data[0].y) > THRESHOLDH || abs(prevZ - data[0].z) > THRESHOLDH || abs(prevX - data[0].x) > THRESHOLDH)){
+    if (i >= 30 && i <= 56 && ((abs(prevY - data[0].y) > THRESHOLDH && abs(prevZ - data[0].z) > THRESHOLDH) || (abs(prevX - data[0].x) > THRESHOLDH && abs(prevZ - data[0].z) > THRESHOLDH))){
       //TIMER START
       time_ms(&time_1, &mil_1);
   		vibes_short_pulse();
@@ -107,6 +107,12 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
         window_set_background_color(s_main_window, GColorWhite);
       } else {
         window_set_background_color(s_main_window, GColorRed);
+      }
+    } else {
+      if (watch_info_get_model() == WATCH_INFO_MODEL_PEBBLE_ORIGINAL) {
+        window_set_background_color(s_main_window, GColorWhite);
+      } else {
+        window_set_background_color(s_main_window, GColorGreen);
       }
     }
   }
