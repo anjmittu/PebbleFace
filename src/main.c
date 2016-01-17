@@ -2,7 +2,7 @@
 #include <pebble.h>
 #include <pebble.h>
 #define THRESHOLDL 100
-#define THRESHOLDM 400
+#define THRESHOLDM 300
 #define THRESHOLDH 300
 
 static Window *s_main_window;
@@ -57,9 +57,8 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       return;
   	}
     //Calibrating or steadying
-    if (i < 50 && !(abs(prevY - data[0].y) < THRESHOLDL && abs(prevX - data[0].x) < THRESHOLDL && abs(prevZ - data[0].z) < THRESHOLDL)) {
+    if (i < 15 && !(abs(prevY - data[0].y) < THRESHOLDL && abs(prevX - data[0].x) < THRESHOLDL && abs(prevZ - data[0].z) < THRESHOLDL)) {
       //DISPLAY NOT READY
-      APP_LOG(APP_LOG_LEVEL_INFO, "not ready");
       i = 0;
       prevY = data[0].y;
   		prevX = data[0].x;
@@ -69,17 +68,16 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
     else { 
       //DISPLAY READY
       i++ ;
-      APP_LOG(APP_LOG_LEVEL_INFO, "%d" , i );
     }
-    if (i >= 40 && i <= 66 && (abs(prevY - data[0].y) > THRESHOLDH  || abs(prevX - data[0].x) > THRESHOLDH || abs(prevZ - data[0].z) > THRESHOLDH)){
+    if (i >= 10 && i <= 21 && (abs(prevY - data[0].y) > THRESHOLDH  || abs(prevX - data[0].x) > THRESHOLDH || abs(prevZ - data[0].z) > THRESHOLDH)){
       //TIMER START
       time_ms(&time_1, &mil_1);
   		vibes_short_pulse();
       i = 0;
       STARTED = true;
-      wait = 75;
+      wait = 20;
     }
-    else if (i >= 65) { i = 40 ; return;}
+    else if (i >= 20) { i = 10 ; return;}
     else {
       prevY = data[0].y;
   		prevX = data[0].x;
@@ -160,7 +158,7 @@ static void click_config_provider(void *context) {
 void init(){
 	accel_data_service_subscribe(1, data_handler);
 
-	accel_service_set_sampling_rate(ACCEL_SAMPLING_25HZ);
+	accel_service_set_sampling_rate(ACCEL_SAMPLING_10HZ);
 	
 	s_main_window = window_create();
   
