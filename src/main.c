@@ -120,7 +120,11 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
     text_layer_set_text(s_time_layer, buf);
   
     if (time_ > user_time) {
-      window_set_background_color(s_main_window, GColorRed);
+      if (watch_info_get_model() == WATCH_INFO_MODEL_PEBBLE_ORIGINAL) {
+        window_set_background_color(s_main_window, GColorWhite);
+      } else {
+        window_set_background_color(s_main_window, GColorRed);
+      }
       APP_LOG(APP_LOG_LEVEL_INFO, "Too high");
     }
   }
@@ -139,6 +143,11 @@ static void main_window_load(Window *window){
 	
 	s_time_layer = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(58, 52), bounds.size.w, 50));
 	
+  if (watch_info_get_model() == WATCH_INFO_MODEL_PEBBLE_ORIGINAL) {
+    window_set_background_color(window, GColorWhite);
+  } else {
+    window_set_background_color(window, GColorGreen);
+  }
 	text_layer_set_background_color(s_time_layer, GColorClear);
   text_layer_set_text_color(s_time_layer, GColorBlack);
 	text_layer_set_font(s_time_layer, fonts_get_system_font(FONT_KEY_GOTHIC_28));
