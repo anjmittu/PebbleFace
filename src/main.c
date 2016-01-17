@@ -1,4 +1,4 @@
-
+/*
 #include <pebble.h>
 #include <pebble.h>
 #define THRESHOLDREADY 70
@@ -207,3 +207,4 @@ int main(){
 	deinit();
 	return 0;
 }
+*/
