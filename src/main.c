@@ -1,7 +1,7 @@
 #include <pebble.h>
 #include <pebble.h>
-#define THRESHOLDREADY 100
-#define THRESHOLDSTART 120
+#define THRESHOLDREADY 80
+#define THRESHOLDSTART 100
 #define THRESHOLDSTOP 275
 
 static Window *s_main_window;
