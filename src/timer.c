@@ -7,7 +7,7 @@
 
 static Window *s_main_window;
 static TextLayer *s_time_layer, *status_layer;
-int prevY[] = {10000000,10000000, 10000000};
+int prevY[] = {10000000, 10000000, 10000000};
 int prevX[] = {10000000, 10000000, 10000000};
 int prevZ[] = {10000000, 10000000, 10000000};
 double time_ = 0, mil = 0;
@@ -19,6 +19,8 @@ bool STARTED = false ;
 int wait = 0;
 static char buf[] = "00000000000";
 bool on_off = true;
+int pos = 0;
+
 
 void ftoa(char* str, double val, int precision) {
   //  start with positive/negative
@@ -50,16 +52,18 @@ void ftoa(char* str, double val, int precision) {
 static void data_handler(AccelData *data, uint32_t num_samples) {
   if (wait > 0){
     wait--; 
-    prevY[0] = data[0].y;
-  	prevX = data[0].x;
-  	prevZ = data[0].z;
+    prevY[pos%3] = data[0].y;
+		prevX[pos%3] = data[0].x;
+		prevZ[pos%3] = data[0].z;
+		pos++;
     return;}
   if (STARTED == false){
     //Start reading
     for ( int i = 0; i<3; i++){ if ( prevY[i] == 10000000, && prevX[i] == 10000000 && prevZ[i] == 10000000){
-  		prevY = data[0].y;
-  		prevX = data[0].x;
-  		prevZ = data[0].z;
+  		prevY[pos%3] = data[0].y;
+			prevX[pos%3] = data[0].x;
+			prevZ[pos%3] = data[0].z;
+			pos++;
       return;}
   	}
     //Calibrating or steadying
@@ -67,9 +71,10 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       //DISPLAY NOT READY
       text_layer_set_text(status_layer, "Waiting");
       i = 0;
-      prevY = data[0].y;
-  		prevX = data[0].x;
-  		prevZ = data[0].z;
+      prevY[pos%3] = data[0].y;
+			prevX[pos%3] = data[0].x;
+			prevZ[pos%3] = data[0].z;
+			pos++;
       return;
     }
     else { 
@@ -88,9 +93,10 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
     }
     else if (i >= 30) { i = 20 ; return;}
     else {
-      prevY = data[0].y;
-  		prevX = data[0].x;
-  		prevZ = data[0].z;
+      prevY[pos%3] = data[0].y;
+			prevX[pos%3] = data[0].x;
+			prevZ[pos%3] = data[0].z;
+			pos++;
       return;
     }
   }
@@ -125,9 +131,12 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       }
     }
   }
-  prevY = data[0].y;
-	prevX = data[0].x;
-	prevZ = data[0].z;
+	
+	
+  prevY[pos%3] = data[0].y;
+	prevX[pos%3] = data[0].x;
+	prevZ[pos%3] = data[0].z;
+	pos++;
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
