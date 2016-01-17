@@ -2,8 +2,8 @@
 #include <pebble.h>
 #include <pebble.h>
 #define THRESHOLDL 230
-#define THRESHOLDM 250
-#define THRESHOLDH 250
+#define THRESHOLDM 270
+#define THRESHOLDH 375
 
 static Window *s_main_window;
 static TextLayer *s_time_layer;
@@ -71,7 +71,7 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       i++ ;
       APP_LOG(APP_LOG_LEVEL_INFO, "%d" , i );
     }
-    if (i >= 30 && i <= 56 && ((abs(prevY - data[0].y) > THRESHOLDH && abs(prevZ - data[0].z) > THRESHOLDH) || (abs(prevX - data[0].x) > THRESHOLDH && abs(prevZ - data[0].z) > THRESHOLDH))){
+    if (i >= 30 && i <= 56 && (abs(prevY - data[0].y) > THRESHOLDH  || abs(prevX - data[0].x) > THRESHOLDH || abs(prevZ - data[0].z) > THRESHOLDH)){
       //TIMER START
       time_ms(&time_1, &mil_1);
   		vibes_short_pulse();
