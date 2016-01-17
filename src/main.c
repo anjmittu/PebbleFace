@@ -10,7 +10,6 @@ static TextLayer *s_time_layer, *status_layer;
 int prevY = 10000000;
 int prevX = 10000000;
 int prevZ = 10000000;
-bool started = false;
 double time_ = 0, mil = 0;
 double user_time = 5.00;
 time_t time_1, time_2;
@@ -19,6 +18,7 @@ int i = 0;
 bool STARTED = false ;
 int wait = 0;
 static char buf[] = "00000000000";
+bool on_off = true;
 
 void ftoa(char* str, double val, int precision) {
   //  start with positive/negative
@@ -65,6 +65,7 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
     //Calibrating or steadying
     if (i < 15 && !(abs(prevY - data[0].y) < THRESHOLDREADY && abs(prevX - data[0].x) < THRESHOLDREADY && abs(prevZ - data[0].z) < THRESHOLDREADY)) {
       //DISPLAY NOT READY
+      text_layer_set_text(status_layer, "Waiting");
       i = 0;
       prevY = data[0].y;
   		prevX = data[0].x;
@@ -73,6 +74,7 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
     }
     else { 
       //DISPLAY READY
+      text_layer_set_text(status_layer, "Ready");
       i++ ;
     }
     if (i >= 10 && i <= 21 && (abs(prevY - data[0].y) > THRESHOLDSTART  || abs(prevX - data[0].x) > THRESHOLDSTART || abs(prevZ - data[0].z) > THRESHOLDSTART)){
@@ -128,9 +130,17 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
-  accel_data_service_unsubscribe();
-  text_layer_set_text(status_layer, "Stopped");
-  text_layer_set_text(s_time_layer, buf);
+  if (on_off == true) {
+    accel_data_service_unsubscribe();
+    text_layer_set_text(status_layer, "Stopped");
+    text_layer_set_text(s_time_layer, buf);
+    on_off = false;
+  } else {
+    accel_data_service_subscribe(1, data_handler);
+    text_layer_set_text(status_layer, "");
+    text_layer_set_text(s_time_layer, "0.00");
+    on_off = true;
+  }
 }
 
 static void main_window_load(Window *window){
