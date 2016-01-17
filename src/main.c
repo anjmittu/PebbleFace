@@ -1,22 +1,38 @@
 #include <pebble.h>
 
+
 static Window *s_main_window;
 static TextLayer *s_time_layer;
+int prevX = 10000000;
+bool started = false;
+int wait = 0;
 
 static void data_handler(AccelData *data, uint32_t num_samples) {
-  // Long lived buffer
-  static char s_buffer[128];
+	if (wait > 0){
+		wait--;
+	}else{
+		// Long lived buffer
+		if (prevX == 10000000){
+			prevX = data[0].x;
+		}
 
-  // Compose string of all data for 3 samples
-  snprintf(s_buffer, sizeof(s_buffer), 
-    "N X,Y,Z\n0 %d,%d,%d\n",//1 %d,%d,%d\n2 %d,%d,%d", 
-    data[0].x, data[0].y, data[0].z//, 
-    //data[1].x, data[1].y, data[1].z, 
-    //data[2].x, data[2].y, data[2].z
-  );
+		else if (abs(prevX-data[0].x) > 400){
+			if(started){
+				started = false;
+				APP_LOG(APP_LOG_LEVEL_INFO, "end");
+				APP_LOG(APP_LOG_LEVEL_INFO, "%d", data[0].x);
+			}else{
+				started = true;
+				APP_LOG(APP_LOG_LEVEL_INFO, "start");
+				APP_LOG(APP_LOG_LEVEL_INFO, "%d", data[0].x);
+			}
+			prevX = data[0].x;
+			wait = 10;
+		}
+	}
+
 
   //Show the data
-  APP_LOG(APP_LOG_LEVEL_INFO, s_buffer);
 }
 
 static void main_window_load(Window *window){
