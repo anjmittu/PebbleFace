@@ -1,9 +1,9 @@
 
 #include <pebble.h>
 #include <pebble.h>
-#define THRESHOLDL 100
-#define THRESHOLDM 300
-#define THRESHOLDH 300
+#define THRESHOLDREADY 50
+#define THRESHOLDSTART 300
+#define THRESHOLDSTOP 200
 
 static Window *s_main_window;
 static TextLayer *s_time_layer;
@@ -47,7 +47,12 @@ void ftoa(char* str, double val, int precision) {
 }
 
 static void data_handler(AccelData *data, uint32_t num_samples) {
-  if (wait > 0){wait--; return;}
+  if (wait > 0){
+    wait--; 
+    prevY = data[0].y;
+  	prevX = data[0].x;
+  	prevZ = data[0].z;
+    return;}
   if (STARTED == false){
     //Start reading
   	if (prevY == 10000000 && prevX == 10000000 && prevZ == 10000000){
@@ -57,8 +62,9 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       return;
   	}
     //Calibrating or steadying
-    if (i < 15 && !(abs(prevY - data[0].y) < THRESHOLDL && abs(prevX - data[0].x) < THRESHOLDL && abs(prevZ - data[0].z) < THRESHOLDL)) {
+    if (i < 15 && !(abs(prevY - data[0].y) < THRESHOLDREADY && abs(prevX - data[0].x) < THRESHOLDREADY && abs(prevZ - data[0].z) < THRESHOLDREADY)) {
       //DISPLAY NOT READY
+      text_layer_set_text(s_time_layer, "Wait");
       i = 0;
       prevY = data[0].y;
   		prevX = data[0].x;
@@ -69,13 +75,14 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       //DISPLAY READY
       i++ ;
     }
-    if (i >= 10 && i <= 21 && (abs(prevY - data[0].y) > THRESHOLDH  || abs(prevX - data[0].x) > THRESHOLDH || abs(prevZ - data[0].z) > THRESHOLDH)){
+    if (i >= 10 && i <= 21 && (abs(prevY - data[0].y) > THRESHOLDSTART  || abs(prevX - data[0].x) > THRESHOLDSTART || abs(prevZ - data[0].z) > THRESHOLDSTART)){
       //TIMER START
       time_ms(&time_1, &mil_1);
   		vibes_short_pulse();
       i = 0;
       STARTED = true;
       wait = 20;
+      text_layer_set_text(s_time_layer, "Running");
     }
     else if (i >= 20) { i = 10 ; return;}
     else {
@@ -85,7 +92,7 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       return;
     }
   }
-  if ( (abs(prevY - data[0].y) > THRESHOLDM && abs(prevX - data[0].x) > THRESHOLDM && abs(prevZ - data[0].z) > THRESHOLDM) ) {
+  if ( (abs(prevY - data[0].y) > THRESHOLDSTOP && abs(prevX - data[0].x) > THRESHOLDSTOP && abs(prevZ - data[0].z) > THRESHOLDSTOP) ) {
     //Timer stop
     time_ms(&time_2, &mil_2);
     STARTED = false;
@@ -94,7 +101,7 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
     time_ = time_2 - time_1;
     mil = mil_2 - mil_1;
     //Extra .004 sec
-    time_ = time_ + (mil/1000) - .004;
+    time_ = time_ + (mil/1000);
   
     static char buf[] = "00000000000";
     ftoa(buf, time_, 3);
@@ -114,12 +121,9 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       }
     }
   }
-  
-  
   prevY = data[0].y;
 	prevX = data[0].x;
 	prevZ = data[0].z;
-  
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
