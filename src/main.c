@@ -1,7 +1,7 @@
 
 #include <pebble.h>
 #include <pebble.h>
-#define THRESHOLDL 230
+#define THRESHOLDL 180
 #define THRESHOLDM 450
 #define THRESHOLDH 250
 
