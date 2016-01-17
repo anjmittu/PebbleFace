@@ -2,8 +2,8 @@
 #include <pebble.h>
 #include <pebble.h>
 #define THRESHOLDREADY 70
-#define THRESHOLDSTART 250
-#define THRESHOLDSTOP 300
+#define THRESHOLDSTART 125
+#define THRESHOLDSTOP 180
 
 static Window *s_main_window;
 static TextLayer *s_time_layer, *status_layer;
@@ -77,7 +77,7 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       text_layer_set_text(status_layer, "Ready");
       i++ ;
     }
-    if (i >= 18 && (abs(prevY - data[0].y) >= THRESHOLDSTART  || abs(prevX - data[0].x) >= THRESHOLDSTART || abs(prevZ - data[0].z) >= THRESHOLDSTART)){
+    if (i >= 13 && (abs(prevY - data[0].y) >= THRESHOLDSTART  || abs(prevX - data[0].x) >= THRESHOLDSTART || abs(prevZ - data[0].z) >= THRESHOLDSTART)){
       //TIMER START
       time_ms(&time_1, &mil_1);
   		vibes_short_pulse();
