@@ -2,7 +2,7 @@
 #include <pebble.h>
 #define THRESHOLDREADY 100
 #define THRESHOLDSTART 120
-#define THRESHOLDSTOP 230
+#define THRESHOLDSTOP 275
 
 static Window *s_main_window;
 static TextLayer *s_time_layer, *status_layer;
@@ -93,7 +93,7 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       return;
     }
   }
-  if ( (abs(prevY - data[0].y) > THRESHOLDSTOP && abs(prevX - data[0].x) > THRESHOLDSTOP && abs(prevZ - data[0].z) > THRESHOLDSTOP) ) {
+  else if ( (abs(prevY - data[0].y) > THRESHOLDSTOP && abs(prevX - data[0].x) > THRESHOLDSTOP && abs(prevZ - data[0].z) > THRESHOLDSTOP) ) {
     //Timer stop
     time_ms(&time_2, &mil_2);
     STARTED = false;
