@@ -1,7 +1,7 @@
 
 #include <pebble.h>
 #include <pebble.h>
-#define THRESHOLDL 180
+#define THRESHOLDL 140
 #define THRESHOLDM 400
 #define THRESHOLDH 270
 
@@ -57,7 +57,7 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       return;
   	}
     //Calibrating or steadying
-    if (i < 40 && !(abs(prevY - data[0].y) < THRESHOLDL && abs(prevX - data[0].x) < THRESHOLDL && abs(prevZ - data[0].z) < THRESHOLDL)) {
+    if (i < 50 && !(abs(prevY - data[0].y) < THRESHOLDL && abs(prevX - data[0].x) < THRESHOLDL && abs(prevZ - data[0].z) < THRESHOLDL)) {
       //DISPLAY NOT READY
       APP_LOG(APP_LOG_LEVEL_INFO, "not ready");
       i = 0;
@@ -71,7 +71,7 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       i++ ;
       APP_LOG(APP_LOG_LEVEL_INFO, "%d" , i );
     }
-    if (i >= 30 && i <= 56 && (abs(prevY - data[0].y) > THRESHOLDH  || abs(prevX - data[0].x) > THRESHOLDH || abs(prevZ - data[0].z) > THRESHOLDH)){
+    if (i >= 40 && i <= 66 && (abs(prevY - data[0].y) > THRESHOLDH  || abs(prevX - data[0].x) > THRESHOLDH || abs(prevZ - data[0].z) > THRESHOLDH)){
       //TIMER START
       time_ms(&time_1, &mil_1);
   		vibes_short_pulse();
@@ -79,7 +79,7 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       STARTED = true;
       wait = 75;
     }
-    else if (i >= 55) { i = 30 ; return;}
+    else if (i >= 65) { i = 40 ; return;}
     else {
       prevY = data[0].y;
   		prevX = data[0].x;
