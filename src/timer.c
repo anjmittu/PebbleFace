@@ -1,4 +1,4 @@
-#include <pebble.h>
+/*#include <pebble.h>
 
 static Window *s_main_window;
 static TextLayer *s_time_layer;
@@ -35,16 +35,16 @@ void ftoa(char* str, double val, int precision) {
 }
 
 void start( ) {
-  /*for (int i = 0; i < 6000; i++){
+  for (int i = 0; i < 6000; i++){
     static char buf[] = "00000000000";
     ftoa(buf, time_, 3);
     text_layer_set_text(s_time_layer, buf);
     psleep(1);
     time_= time_ + .001;
-  }*/
+  }
   
   time_ms(&time_1, &mil_1);
-  psleep(5500);
+  psleep(2305);
   time_ms(&time_2, &mil_2);
   
   time_ = time_2 - time_1;
@@ -108,3 +108,4 @@ int main(){
 	deinit();
 	return 0;
 }
+*/
