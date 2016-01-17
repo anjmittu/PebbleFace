@@ -1,8 +1,8 @@
 
 #include <pebble.h>
 #include <pebble.h>
-#define THRESHOLDREADY 150
-#define THRESHOLDSTART 200
+#define THRESHOLDREADY 70
+#define THRESHOLDSTART 250
 #define THRESHOLDSTOP 300
 
 static Window *s_main_window;
@@ -63,7 +63,7 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       return;
   	}
     //Calibrating or steadying
-    if (i < 15 && !(abs(prevY - data[0].y) < THRESHOLDREADY && abs(prevX - data[0].x) < THRESHOLDREADY && abs(prevZ - data[0].z) < THRESHOLDREADY)) {
+    if (i < 25 && !(abs(prevY - data[0].y) < THRESHOLDREADY && abs(prevX - data[0].x) < THRESHOLDREADY && abs(prevZ - data[0].z) < THRESHOLDREADY)) {
       //DISPLAY NOT READY
       text_layer_set_text(status_layer, "Waiting");
       i = 0;
@@ -77,16 +77,16 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       text_layer_set_text(status_layer, "Ready");
       i++ ;
     }
-    if (i >= 10 && i <= 21 && (abs(prevY - data[0].y) > THRESHOLDSTART  || abs(prevX - data[0].x) > THRESHOLDSTART || abs(prevZ - data[0].z) > THRESHOLDSTART)){
+    if (i >= 18 && (abs(prevY - data[0].y) >= THRESHOLDSTART  || abs(prevX - data[0].x) >= THRESHOLDSTART || abs(prevZ - data[0].z) >= THRESHOLDSTART)){
       //TIMER START
       time_ms(&time_1, &mil_1);
   		vibes_short_pulse();
       i = 0;
       STARTED = true;
-      wait = 20;
+      wait = 40;
       text_layer_set_text(status_layer, "Running");
     }
-    else if (i >= 20) { i = 10 ; return;}
+    else if (i >= 30) { i = 20 ; return;}
     else {
       prevY = data[0].y;
   		prevX = data[0].x;
@@ -101,6 +101,7 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
     i = 0;
     wait = 5;
     vibes_long_pulse();
+    text_layer_set_text(status_layer, "GG");
     
     time_ = time_2 - time_1;
     mil = mil_2 - mil_1;
@@ -140,6 +141,7 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
     text_layer_set_text(status_layer, "");
     text_layer_set_text(s_time_layer, "0.00");
     on_off = true;
+    i = 0;
   }
 }
 
