@@ -1,4 +1,4 @@
-
+/*
 #include <pebble.h>
 #include <pebble.h>
 #define THRESHOLDREADY 70
@@ -16,7 +16,7 @@ time_t time_1, time_2;
 uint16_t mil_1, mil_2;
 int i = 0;
 bool STARTED = false ;
-int wait = 0;
+int wait = 3;
 static char buf[] = "00000000000";
 bool on_off = true;
 int pos = 0;
@@ -58,14 +58,6 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
 		pos++;
     return;}
   if (STARTED == false){
-    //Start reading
-    for ( int i = 0; i<3; i++){ if ( prevY[i] == 10000000, && prevX[i] == 10000000 && prevZ[i] == 10000000){
-  		prevY[pos%3] = data[0].y;
-			prevX[pos%3] = data[0].x;
-			prevZ[pos%3] = data[0].z;
-			pos++;
-      return;}
-  	}
     //Calibrating or steadying
     if (i < 25 && !(abs(prevY - data[0].y) < THRESHOLDREADY && abs(prevX - data[0].x) < THRESHOLDREADY && abs(prevZ - data[0].z) < THRESHOLDREADY)) {
       //DISPLAY NOT READY
@@ -216,3 +208,5 @@ int main(){
 	deinit();
 	return 0;
 }
+*/
+

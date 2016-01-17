@@ -1,9 +1,8 @@
-/*
 #include <pebble.h>
 #include <pebble.h>
-#define THRESHOLDREADY 70
-#define THRESHOLDSTART 125
-#define THRESHOLDSTOP 180
+#define THRESHOLDREADY 100
+#define THRESHOLDSTART 120
+#define THRESHOLDSTOP 230
 
 static Window *s_main_window;
 static TextLayer *s_time_layer, *status_layer;
@@ -63,7 +62,7 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       return;
   	}
     //Calibrating or steadying
-    if (i < 25 && !(abs(prevY - data[0].y) < THRESHOLDREADY && abs(prevX - data[0].x) < THRESHOLDREADY && abs(prevZ - data[0].z) < THRESHOLDREADY)) {
+    if (i < 15 && (abs(prevY - data[0].y) > THRESHOLDREADY || abs(prevX - data[0].x) > THRESHOLDREADY || abs(prevZ - data[0].z) > THRESHOLDREADY)) {
       //DISPLAY NOT READY
       text_layer_set_text(status_layer, "Waiting");
       i = 0;
@@ -77,7 +76,7 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       text_layer_set_text(status_layer, "Ready");
       i++ ;
     }
-    if (i >= 13 && (abs(prevY - data[0].y) >= THRESHOLDSTART  || abs(prevX - data[0].x) >= THRESHOLDSTART || abs(prevZ - data[0].z) >= THRESHOLDSTART)){
+    if (i >= 13 && (abs(prevY - data[0].y) >= THRESHOLDSTART  && abs(prevX - data[0].x) >= THRESHOLDSTART && abs(prevZ - data[0].z) >= THRESHOLDSTART)){
       //TIMER START
       time_ms(&time_1, &mil_1);
   		vibes_short_pulse();
@@ -86,7 +85,7 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       wait = 40;
       text_layer_set_text(status_layer, "Running");
     }
-    else if (i >= 30) { i = 20 ; return;}
+    else if (i >= 20) { i = 10 ; return;}
     else {
       prevY = data[0].y;
   		prevX = data[0].x;
@@ -207,4 +206,3 @@ int main(){
 	deinit();
 	return 0;
 }
-*/
